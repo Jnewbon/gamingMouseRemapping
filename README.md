@@ -7,8 +7,9 @@ In MMOs however this keymapping is undesirable and remapping them to the numpad 
 
 # Installation
 
-Copy the require mapping file to your home directory
-source the file in your .bashrc
+1. Copy the require mapping file to your home directory
+1. source the file in your .bashrc
+
 This does require that you open a terminal to apply the remapping
 
 ```
