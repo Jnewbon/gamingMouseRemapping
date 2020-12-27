@@ -1,34 +1,50 @@
-remote_id=$(
-    xinput list |
-    sed -n 's/.*Razer Razer Naga Chroma\s*id=\([0-9]*\).*keyboard.*/\1/p'
-)
-[ "$remote_id" ] || exit
+echo $(
+        xinput list |
+        sed -n 's/.*Razer Razer Naga Chroma\s*id=\([0-9]*\).*keyboard.*/\1/p'
+    )
 
-# remap the following keys, only for my custom vintage atari joystick connected
-# through an old USB keyboard:
-#
-# Razernaga mapping
-# 3 6 5 12(*)
-# 2 5 8 11(0)
-# 1 4 7 10(/)
-# each button is mapped to the numpad equivilent except for 10-12 which are /,0,* respectivly on the numpad
+if [[ -z $1 ]]
+then
+    remote_id=$(
+        xinput list |
+        sed -n 's/.*Razer Razer Naga Chroma\s*id=\([0-9]*\).*keyboard.*/\1/p'
+    )
+    [ "$remote_id" ] || exit
+    echo $remote_id
+#    remote_id=`echo $remote_id | awk '{print $NF}'`
+else
+    remote_id=$1
+fi
+for value in $remote_id
+do
+    echo "Applied to" $value
 
-mkdir -p /tmp/xkb/symbols
-cat >/tmp/xkb/symbols/custom <<\EOF
-xkb_symbols "remote" {
-    key <AE01> { [KP_End, KP_1, U2199, U21D9] };
-    key <AE02> { [KP_Down, KP_2, U2193, U21D3] };
-    key <AE03> { [KP_Next, KP_3, U2198, U21D8] };
-    key <AE04> { [KP_Left, KP_4, U2190, U21D0] };
-    key <AE05> { [KP_Begin, KP_5, U2194, U21D4] };
-    key <AE06> { [KP_Right, KP_6, U2192, U21D2] };
-    key <AE07> { [KP_Home, KP_7, U2196, U21D6] };
-    key <AE08> { [KP_Up, KP_8, U2191, U21D1] };
-    key <AE09> { [KP_Prior, KP_9, U2197, U21D7] };
-    key <AE10> { [KP_Divide, U2215, 0x10000f7, VoidSymbol, XF86Ungrab] };
-    key <AE11> { [KP_Insert, KP_0, U2195, U21D5] };
-    key <AE12> { [KP_Multiply, U22C5, 0x10000d7, VoidSymbol, XF86ClearGrab] };
-};
+    # remap the following keys, only for my custom vintage atari joystick connected
+    # through an old USB keyboard:
+    #
+    # Razer naga mapping
+    # 3 6 5 12(*)
+    # 2 5 8 11(0)
+    # 1 4 7 10(/)
+    # each button is mapped to the numpad equivalent except for 10-12 which are /,0,* respectively on the numpad
+
+    mkdir -p /tmp/xkb/symbols
+    cat >/tmp/xkb/symbols/custom <<\EOF
+    xkb_symbols "remote" {
+        key <AE01> { [KP_End, KP_1, U2199, U21D9] };
+        key <AE02> { [KP_Down, KP_2, U2193, U21D3] };
+        key <AE03> { [KP_Next, KP_3, U2198, U21D8] };
+        key <AE04> { [KP_Left, KP_4, U2190, U21D0] };
+        key <AE05> { [KP_Begin, KP_5, U2194, U21D4] };
+        key <AE06> { [KP_Right, KP_6, U2192, U21D2] };
+        key <AE07> { [KP_Home, KP_7, U2196, U21D6] };
+        key <AE08> { [KP_Up, KP_8, U2191, U21D1] };
+        key <AE09> { [KP_Prior, KP_9, U2197, U21D7] };
+        key <AE10> { [KP_Divide, U2215, 0x10000f7, VoidSymbol, XF86Ungrab] };
+        key <AE11> { [KP_Insert, KP_0, U2195, U21D5] };
+        key <AE12> { [KP_Multiply, U22C5, 0x10000d7, VoidSymbol, XF86ClearGrab] };
+    };
 EOF
 
-setxkbmap -device $remote_id -print | sed 's/\(xkb_symbols.*\)"/\1+custom(remote)"/' | xkbcomp -I/tmp/xkb -i $remote_id -synch - $DISPLAY 2>/dev/null
+    setxkbmap -device $value -print | sed 's/\(xkb_symbols.*\)"/\1+custom(remote)"/' | xkbcomp -I/tmp/xkb -i $value -synch - $DISPLAY 2>/dev/null
+done
